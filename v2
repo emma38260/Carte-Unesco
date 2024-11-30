@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte des Zones d'Inondation</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        #map {
+            width: 100%;
+            height: 90vh;
+        }
+
+        #draggable {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 300px;
+            height: 200px;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            overflow: auto;
+            cursor: move;
+            z-index: 1000;
+        }
+
+        #draggable h4 {
+            margin: 0 0 10px;
+            cursor: grab;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <div id="draggable">
+        <h4>Fenêtre Glissante</h4>
+        <p>Utilisez cette fenêtre pour ajouter des informations ou personnaliser l'affichage.</p>
+        <ul>
+            <li><b>Option 1:</b> Visualiser les données d'inondation.</li>
+            <li><b>Option 2:</b> Ajouter une couche supplémentaire.</li>
+        </ul>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialiser la carte
+        var map = L.map('map').setView([46.603354, 1.888334], 6); // Centre de la France
+
+        // Ajouter une couche de fond OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Exemple de données d'inondation (remplacez par vos données réelles)
+        var zonesInondation = [
+            { name: "Zone 1", lat: 48.8566, lon: 2.3522, description: "Zone à risque élevé à Paris." },
+            { name: "Zone 2", lat: 45.764, lon: 4.8357, description: "Zone modérée à Lyon." },
+            { name: "Zone 3", lat: 43.2965, lon: 5.3698, description: "Zone faible à Marseille." }
+        ];
+
+        // Ajouter les zones sur la carte
+        zonesInondation.forEach(function(zone) {
+            var marker = L.marker([zone.lat, zone.lon]).addTo(map);
+            marker.bindPopup(`<b>${zone.name}</b><br>${zone.description}`);
+        });
+
+        // Fonctionnalité pour la fenêtre glissante
+        var draggable = document.getElementById("draggable");
+        var offsetX, offsetY;
+
+        draggable.addEventListener("mousedown", function(e) {
+            offsetX = e.clientX - draggable.offsetLeft;
+            offsetY = e.clientY - draggable.offsetTop;
+            document.addEventListener("mousemove", drag);
+            document.addEventListener("mouseup", stopDrag);
+        });
+
+        function drag(e) {
+            draggable.style.left = e.clientX - offsetX + "px";
+            draggable.style.top = e.clientY - offsetY + "px";
+        }
+
+        function stopDrag() {
+            document.removeEventListener("mousemove", drag);
+            document.removeEventListener("mouseup", stopDrag);
+        }
+    </script>
+</body>
+</html>
