@@ -1,114 +1,1027 @@
 <!DOCTYPE html>
 <html>
 <head>
+    
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <title>Carte Interactive UNESCO</title>
-    <script>
-        L_NO_TOUCH = false;
-        L_DISABLE_3D = false;
-    </script>
-    <style>
-        html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
-        #map { position: absolute; top: 0; bottom: 0; right: 0; left: 0; }
-        #sidebar {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 30%;
-            height: 100%;
-            background: white;
-            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            overflow: auto;
-            display: none; /* Caché par défaut */
-        }
-        #toggle-sidebar {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 2000;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        #sidebar #map-sidebar {
-            width: 100%;
-            height: 300px; /* Ajustez selon vos besoins */
-        }
-    </style>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_0448844d3d9cd28792dc5e26bd771852 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+            </style>
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.Default.css"/>
 </head>
 <body>
-    <!-- Carte principale -->
-    <div id="map"></div>
-
-    <!-- Bouton pour ouvrir/fermer le panneau -->
-    <div id="toggle-sidebar">📊 Données climatiques</div>
-
-    <!-- Panneau glissant -->
-    <div id="sidebar">
-        <h3>Indicateurs Géologiques</h3>
-        <p>Voici une carte dédiée aux indicateurs du réchauffement climatique en France.</p>
-        <div id="map-sidebar"></div>
-    </div>
-
-    <script>
-        // Initialiser la carte principale
-        var map = L.map('map').setView([46.603354, 1.888334], 6);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        // Tous les sites UNESCO
-        var unescoSites = [
-            { name: "Mont Saint-Michel", lat: 48.636, lon: -1.511, image: "" },
-            { name: "Cathédrale de Chartres", lat: 48.447, lon: 1.484, image: "" },
-            { name: "Palais et parc de Versailles", lat: 48.8049, lon: 2.1204, image: "" },
-            { name: "Cathédrale d'Amiens", lat: 49.895, lon: 2.302, image: "" },
-            { name: "Cité médiévale de Carcassonne", lat: 43.211, lon: 2.352, image: "" },
-            { name: "Pont du Gard", lat: 43.947, lon: 4.535, image: "" },
-            { name: "Chemins de Saint-Jacques-de-Compostelle", lat: 43.6045, lon: 1.4442, image: "" },
-            { name: "Bordeaux, Port de la Lune", lat: 44.8378, lon: -0.5792, image: "" },
-            { name: "Théâtre antique d'Orange", lat: 44.136, lon: 4.8055, image: "" },
-            { name: "Sites palafittiques préhistoriques autour des Alpes", lat: 45.8992, lon: 6.1296, image: "" }
-        ];
-
-        // Ajouter les marqueurs pour tous les sites
-        unescoSites.forEach(function(site) {
-            L.marker([site.lat, site.lon]).addTo(map)
-                .bindPopup(`<b>${site.name}</b><br>${site.image ? `<img src="${site.image}" width="200">` : ''}`);
-        });
-
-        // Initialiser la carte secondaire dans le panneau latéral
-        var sidebarMap;
-        function initSidebarMap() {
-            sidebarMap = L.map('map-sidebar').setView([46.603354, 1.888334], 6);
-            L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                maxZoom: 17,
-                attribution: '© OpenTopoMap contributors'
-            }).addTo(sidebarMap);
-
-            // Exemple de zones climatiques
-            L.circle([48.8566, 2.3522], { color: 'red', radius: 50000 }).addTo(sidebarMap).bindPopup("Risque de canicule à Paris");
-            L.circle([43.6045, 1.4442], { color: 'blue', radius: 30000 }).addTo(sidebarMap).bindPopup("Zone inondable à Toulouse");
-        }
-
-        // Toggle du panneau
-        var sidebarVisible = false;
-        document.getElementById('toggle-sidebar').onclick = function() {
-            var sidebar = document.getElementById('sidebar');
-            if (!sidebarVisible) {
-                sidebar.style.display = 'block';
-                if (!sidebarMap) initSidebarMap(); // Initialiser la carte uniquement lors de la première ouverture
-            } else {
-                sidebar.style.display = 'none';
-            }
-            sidebarVisible = !sidebarVisible;
-        };
-    </script>
+    
+    
+            <div class="folium-map" id="map_0448844d3d9cd28792dc5e26bd771852" ></div>
+        
 </body>
+<script>
+    
+    
+            var map_0448844d3d9cd28792dc5e26bd771852 = L.map(
+                "map_0448844d3d9cd28792dc5e26bd771852",
+                {
+                    center: [20.0, 0.0],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 2,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_653d27cd29aa66cfba9afed32176c308 = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_0448844d3d9cd28792dc5e26bd771852);
+        
+    
+            var marker_cluster_ce6691643d775546087c88882cc22db1 = L.markerClusterGroup(
+                {}
+            );
+            map_0448844d3d9cd28792dc5e26bd771852.addLayer(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+            var marker_5537a15781df4a0416074ee9f2f829f7 = L.marker(
+                [47.639661, 4.389327],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_20142c411610694c5b398c4bbc8958be = L.popup({"maxWidth": 250});
+
+        
+            var html_87613724c23dfd4e9fecc8115d502369 = $(`<div id="html_87613724c23dfd4e9fecc8115d502369" style="width: 100.0%; height: 100.0%;"><b>Abbey of Fontenay</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Abbaye%20de%20Fontenay%20R01.jpg' width='200'></div>`)[0];
+            popup_20142c411610694c5b398c4bbc8958be.setContent(html_87613724c23dfd4e9fecc8115d502369);
+        
+
+        marker_5537a15781df4a0416074ee9f2f829f7.bindPopup(popup_20142c411610694c5b398c4bbc8958be)
+        ;
+
+        
+    
+    
+            var marker_2a66d1d35385f9395148ca80abc409e1 = L.marker(
+                [49.0, 15.0],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_d896699e5b0bd6dd2dc2221e84164194 = L.popup({"maxWidth": 250});
+
+        
+            var html_cd848b8d617f7d570db422e8e18897bd = $(`<div id="html_cd848b8d617f7d570db422e8e18897bd" style="width: 100.0%; height: 100.0%;"><b>Ancient and Primeval Beech Forests of the Carpathians and Other Regions of Europe</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Tysa%20Rakhiv.jpg' width='200'></div>`)[0];
+            popup_d896699e5b0bd6dd2dc2221e84164194.setContent(html_cd848b8d617f7d570db422e8e18897bd);
+        
+
+        marker_2a66d1d35385f9395148ca80abc409e1.bindPopup(popup_d896699e5b0bd6dd2dc2221e84164194)
+        ;
+
+        
+    
+    
+            var marker_4559c2e3b9887f5f577bc1bce238e2fa = L.marker(
+                [47.08222, 2.39917],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_798ec9c7f5b5b9556dafeb9917ad4436 = L.popup({"maxWidth": 250});
+
+        
+            var html_9990da844a13c0b7bef7efedd630a62f = $(`<div id="html_9990da844a13c0b7bef7efedd630a62f" style="width: 100.0%; height: 100.0%;"><b>Bourges Cathedral</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Bourges-Kathedrale-110-2008-gje.jpg' width='200'></div>`)[0];
+            popup_798ec9c7f5b5b9556dafeb9917ad4436.setContent(html_9990da844a13c0b7bef7efedd630a62f);
+        
+
+        marker_4559c2e3b9887f5f577bc1bce238e2fa.bindPopup(popup_798ec9c7f5b5b9556dafeb9917ad4436)
+        ;
+
+        
+    
+    
+            var marker_06fd0674aad940b54ab952200eb15485 = L.marker(
+                [43.61111111, 1.41833333],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_a1292278324871d05286c992887d4b0a = L.popup({"maxWidth": 250});
+
+        
+            var html_2e9f1cbdedc93aae5de85fcb1cc3fb62 = $(`<div id="html_2e9f1cbdedc93aae5de85fcb1cc3fb62" style="width: 100.0%; height: 100.0%;"><b>Canal du Midi</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Canal%20du%20Midi%2002.jpg' width='200'></div>`)[0];
+            popup_a1292278324871d05286c992887d4b0a.setContent(html_2e9f1cbdedc93aae5de85fcb1cc3fb62);
+        
+
+        marker_06fd0674aad940b54ab952200eb15485.bindPopup(popup_a1292278324871d05286c992887d4b0a)
+        ;
+
+        
+    
+    
+            var marker_906643c0c1579c598b2e7a81a1beddf4 = L.marker(
+                [49.25333333, 4.032777778],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_2f0701fa37bd415e041c2b9911f8b994 = L.popup({"maxWidth": 250});
+
+        
+            var html_52cf9b667dc06a8da3041978d88e8d8d = $(`<div id="html_52cf9b667dc06a8da3041978d88e8d8d" style="width: 100.0%; height: 100.0%;"><b>Cathedral of Notre-Dame, Former Abbey of Saint-Rémi and Palace of Tau, Reims</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Reims%20Kathedrale.jpg' width='200'></div>`)[0];
+            popup_2f0701fa37bd415e041c2b9911f8b994.setContent(html_52cf9b667dc06a8da3041978d88e8d8d);
+        
+
+        marker_906643c0c1579c598b2e7a81a1beddf4.bindPopup(popup_2f0701fa37bd415e041c2b9911f8b994)
+        ;
+
+        
+    
+    
+            var marker_f49192cae318386ccd7e71ca796c6bb3 = L.marker(
+                [49.0775, 3.94611],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_8018144f5c9537d0c3309b2eeefc5c23 = L.popup({"maxWidth": 250});
+
+        
+            var html_39791dbd79e1a5e37b1330cc63a8ae49 = $(`<div id="html_39791dbd79e1a5e37b1330cc63a8ae49" style="width: 100.0%; height: 100.0%;"><b>Champagne hillsides, houses and cellars</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Avenue%20de%20Champagne%2C%20%C3%89pernay%20%288132669246%29.jpg' width='200'></div>`)[0];
+            popup_8018144f5c9537d0c3309b2eeefc5c23.setContent(html_39791dbd79e1a5e37b1330cc63a8ae49);
+        
+
+        marker_f49192cae318386ccd7e71ca796c6bb3.bindPopup(popup_8018144f5c9537d0c3309b2eeefc5c23)
+        ;
+
+        
+    
+    
+            var marker_3db6e5d6b6097f0f67319cb4d900a8e8 = L.marker(
+                [44.3881219, 4.4161408],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_a95cccea13a4283c19fcde6fdb7b9ede = L.popup({"maxWidth": 250});
+
+        
+            var html_66cb33c0fd7f4919bab1c8a02f84eae6 = $(`<div id="html_66cb33c0fd7f4919bab1c8a02f84eae6" style="width: 100.0%; height: 100.0%;"><b>Chauvet Cave</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Rhinoc%C3%A9ros%20grotte%20Chauvet.jpg' width='200'></div>`)[0];
+            popup_a95cccea13a4283c19fcde6fdb7b9ede.setContent(html_66cb33c0fd7f4919bab1c8a02f84eae6);
+        
+
+        marker_3db6e5d6b6097f0f67319cb4d900a8e8.bindPopup(popup_a95cccea13a4283c19fcde6fdb7b9ede)
+        ;
+
+        
+    
+    
+            var marker_b925a7c9ebb7c1a6a04b3d3378fbf9d3 = L.marker(
+                [45.77939, 2.96511],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_f1d07ae4c38f0cdd26ed087cf12082be = L.popup({"maxWidth": 250});
+
+        
+            var html_8dd6b5634ba363d55574453b01b34d1d = $(`<div id="html_8dd6b5634ba363d55574453b01b34d1d" style="width: 100.0%; height: 100.0%;"><b>Chaîne des Puys - Limagne fault tectonic arena</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Quelques%20puys.jpg' width='200'></div>`)[0];
+            popup_f1d07ae4c38f0cdd26ed087cf12082be.setContent(html_8dd6b5634ba363d55574453b01b34d1d);
+        
+
+        marker_b925a7c9ebb7c1a6a04b3d3378fbf9d3.bindPopup(popup_f1d07ae4c38f0cdd26ed087cf12082be)
+        ;
+
+        
+    
+    
+            var marker_5a062ba1e76ba7d92e05f4818681b937 = L.marker(
+                [43.206439, 2.363788],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_ab717b6cf5c3d0f311f9618d0cb86423 = L.popup({"maxWidth": 250});
+
+        
+            var html_50512bffaeb60a175b7fe9ed71938317 = $(`<div id="html_50512bffaeb60a175b7fe9ed71938317" style="width: 100.0%; height: 100.0%;"><b>Cité de Carcassonne</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Cit%C3%A9%20de%20Carcassonne.jpg' width='200'></div>`)[0];
+            popup_ab717b6cf5c3d0f311f9618d0cb86423.setContent(html_50512bffaeb60a175b7fe9ed71938317);
+        
+
+        marker_5a062ba1e76ba7d92e05f4818681b937.bindPopup(popup_ab717b6cf5c3d0f311f9618d0cb86423)
+        ;
+
+        
+    
+    
+            var marker_35fc6525bcb74636290c78ab2369e126 = L.marker(
+                [47.058055555, 4.864444444],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_f526e4189c7c049b54e5456cbe05420f = L.popup({"maxWidth": 250});
+
+        
+            var html_3e5b23105ed3ef72543732e1e97b615f = $(`<div id="html_3e5b23105ed3ef72543732e1e97b615f" style="width: 100.0%; height: 100.0%;"><b>Climats, terroirs of Burgundy</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Frankreich-Burgund-Weinberg%20direkt%20bei%20Beaune.jpg' width='200'></div>`)[0];
+            popup_f526e4189c7c049b54e5456cbe05420f.setContent(html_3e5b23105ed3ef72543732e1e97b615f);
+        
+
+        marker_35fc6525bcb74636290c78ab2369e126.bindPopup(popup_f526e4189c7c049b54e5456cbe05420f)
+        ;
+
+        
+    
+    
+            var marker_158d3ca51d6a4ec7994565778ac3d94d = L.marker(
+                [45.5863198, -1.1733254],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_3171ef1201574f28dccfc95037912ce9 = L.popup({"maxWidth": 250});
+
+        
+            var html_eb4287969b9cf28d051b42abba80de9c = $(`<div id="html_eb4287969b9cf28d051b42abba80de9c" style="width: 100.0%; height: 100.0%;"><b>Cordouan Lighthouse</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Cordouan.jpg' width='200'></div>`)[0];
+            popup_3171ef1201574f28dccfc95037912ce9.setContent(html_eb4287969b9cf28d051b42abba80de9c);
+        
+
+        marker_158d3ca51d6a4ec7994565778ac3d94d.bindPopup(popup_3171ef1201574f28dccfc95037912ce9)
+        ;
+
+        
+    
+    
+            var marker_8dba2b02846cb22c70fee031db63aab6 = L.marker(
+                [43.9283, 2.1425],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_fa89a64275235916930593e93dd1879d = L.popup({"maxWidth": 250});
+
+        
+            var html_ddc9d9bb63c5dcbba4d022a715da95a4 = $(`<div id="html_ddc9d9bb63c5dcbba4d022a715da95a4" style="width: 100.0%; height: 100.0%;"><b>Episcopal City of Albi</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/%28Albi%29%20Cit%C3%A9%20%C3%A9piscopale%20d%27Albi%20-%20Le%20palais%20de%20la%20Berbie%20et%20la%20cath%C3%A9drale%20Ste%20C%C3%A9cile.jpg' width='200'></div>`)[0];
+            popup_fa89a64275235916930593e93dd1879d.setContent(html_ddc9d9bb63c5dcbba4d022a715da95a4);
+        
+
+        marker_8dba2b02846cb22c70fee031db63aab6.bindPopup(popup_fa89a64275235916930593e93dd1879d)
+        ;
+
+        
+    
+    
+            var marker_feac449ffd82de65f7b260ecc050760b = L.marker(
+                [50.2825, 2.75888889],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_959517a07e57abdc451824e1f61bf391 = L.popup({"maxWidth": 250});
+
+        
+            var html_07c734cbb070d4cd67da52b39c3e7624 = $(`<div id="html_07c734cbb070d4cd67da52b39c3e7624" style="width: 100.0%; height: 100.0%;"><b>Fortifications of Vauban</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Villefranche-de-Conflent%20Fortifications%20Tour-du-Diable.jpg' width='200'></div>`)[0];
+            popup_959517a07e57abdc451824e1f61bf391.setContent(html_07c734cbb070d4cd67da52b39c3e7624);
+        
+
+        marker_feac449ffd82de65f7b260ecc050760b.bindPopup(popup_959517a07e57abdc451824e1f61bf391)
+        ;
+
+        
+    
+    
+            var marker_2bc5485e6b8a14d23f5339dd6766637d = L.marker(
+                [46.9375, 5.876388889],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_383cb32809818a1f2d847340102a6137 = L.popup({"maxWidth": 250});
+
+        
+            var html_593e2dc12a35287ab91b318404631b2d = $(`<div id="html_593e2dc12a35287ab91b318404631b2d" style="width: 100.0%; height: 100.0%;"><b>From the Great Saltworks of Salins-les-Bains to the Royal Saltworks of Arc-et-Senans, the Production of Open-pan Salt</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/France%20arc%20et%20senas%20saline%20royal%20main%20building%201.jpg' width='200'></div>`)[0];
+            popup_383cb32809818a1f2d847340102a6137.setContent(html_593e2dc12a35287ab91b318404631b2d);
+        
+
+        marker_2bc5485e6b8a14d23f5339dd6766637d.bindPopup(popup_383cb32809818a1f2d847340102a6137)
+        ;
+
+        
+    
+    
+            var marker_b87395284a0885ce6c6d1e7f68a88978 = L.marker(
+                [44.894722222, 0.155277777],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_6f58caf9da41f7e615c801968d88dd27 = L.popup({"maxWidth": 250});
+
+        
+            var html_b6590d12c46c85675d014b2ab0c325ac = $(`<div id="html_b6590d12c46c85675d014b2ab0c325ac" style="width: 100.0%; height: 100.0%;"><b>Jurisdiction of Saint-Emilion</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/St.%20%C3%A9milion.jpg' width='200'></div>`)[0];
+            popup_6f58caf9da41f7e615c801968d88dd27.setContent(html_b6590d12c46c85675d014b2ab0c325ac);
+        
+
+        marker_b87395284a0885ce6c6d1e7f68a88978.bindPopup(popup_6f58caf9da41f7e615c801968d88dd27)
+        ;
+
+        
+    
+    
+            var marker_fa31cb32fb53fedadefb6550a067ecb2 = L.marker(
+                [48.63556, -1.51056],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_94dd0ca1e985707a666587c4208dc423 = L.popup({"maxWidth": 250});
+
+        
+            var html_d00824465903c61e1f3361ae070cc98f = $(`<div id="html_d00824465903c61e1f3361ae070cc98f" style="width: 100.0%; height: 100.0%;"><b>Mont-Saint-Michel and its Bay</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/2017-04%20Mont%20Saint-Michel%2006.jpg' width='200'></div>`)[0];
+            popup_94dd0ca1e985707a666587c4208dc423.setContent(html_d00824465903c61e1f3361ae070cc98f);
+        
+
+        marker_fa31cb32fb53fedadefb6550a067ecb2.bindPopup(popup_94dd0ca1e985707a666587c4208dc423)
+        ;
+
+        
+    
+    
+            var marker_74c6293d3bff7d958ad3fc5500404210 = L.marker(
+                [48.63556, -1.51056],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_3a43a5747a7fd33f99ccc706c2cbadce = L.popup({"maxWidth": 250});
+
+        
+            var html_333fa040fe1a9b9f27229373aff5717b = $(`<div id="html_333fa040fe1a9b9f27229373aff5717b" style="width: 100.0%; height: 100.0%;"><b>Mont-Saint-Michel and its Bay</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Mont%20Saint-Michel%2C%20Frankreich15.jpg' width='200'></div>`)[0];
+            popup_3a43a5747a7fd33f99ccc706c2cbadce.setContent(html_333fa040fe1a9b9f27229373aff5717b);
+        
+
+        marker_74c6293d3bff7d958ad3fc5500404210.bindPopup(popup_3a43a5747a7fd33f99ccc706c2cbadce)
+        ;
+
+        
+    
+    
+            var marker_e42bf768118514937843016d0fc007f0 = L.marker(
+                [-20.411944444, 164.566388888],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_04a6feaf721e624633bef040f468e25a = L.popup({"maxWidth": 250});
+
+        
+            var html_7a870531f2c90eeef0598b8561e575de = $(`<div id="html_7a870531f2c90eeef0598b8561e575de" style="width: 100.0%; height: 100.0%;"><b>New Caledonia Barrier Reef</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Lagoons%20and%20Reefs%20of%20New%20Caledonia%20May%2010%2C%202001.jpg' width='200'></div>`)[0];
+            popup_04a6feaf721e624633bef040f468e25a.setContent(html_7a870531f2c90eeef0598b8561e575de);
+        
+
+        marker_e42bf768118514937843016d0fc007f0.bindPopup(popup_04a6feaf721e624633bef040f468e25a)
+        ;
+
+        
+    
+    
+            var marker_da8b1c753cc9d37d885cd3fbe39c20a6 = L.marker(
+                [43.701694444, 7.272305555],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_28fd28a981de4cfe8027cfedc2a7b432 = L.popup({"maxWidth": 250});
+
+        
+            var html_bbdd40e873bb58697925347ae957d6c0 = $(`<div id="html_bbdd40e873bb58697925347ae957d6c0" style="width: 100.0%; height: 100.0%;"><b>Nice, Winter Resort Town of the Riviera</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Le%20ch%C3%A2teau%20de%20l%27anglais%20nice.jpg' width='200'></div>`)[0];
+            popup_28fd28a981de4cfe8027cfedc2a7b432.setContent(html_bbdd40e873bb58697925347ae957d6c0);
+        
+
+        marker_da8b1c753cc9d37d885cd3fbe39c20a6.bindPopup(popup_28fd28a981de4cfe8027cfedc2a7b432)
+        ;
+
+        
+    
+    
+            var marker_4fd40500cf7bd6a963e8b0c220a0f47b = L.marker(
+                [49.89457, 2.3021],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_e958b0846b78e1ecb769a884a3d075bc = L.popup({"maxWidth": 250});
+
+        
+            var html_4f681e6d91b1b505711dff9b0d987d49 = $(`<div id="html_4f681e6d91b1b505711dff9b0d987d49" style="width: 100.0%; height: 100.0%;"><b>Notre-Dame d'Amiens</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/0%20Amiens%20-%20Cath%C3%A9drale%20Notre-Dame%20%281%29.JPG' width='200'></div>`)[0];
+            popup_e958b0846b78e1ecb769a884a3d075bc.setContent(html_4f681e6d91b1b505711dff9b0d987d49);
+        
+
+        marker_4fd40500cf7bd6a963e8b0c220a0f47b.bindPopup(popup_e958b0846b78e1ecb769a884a3d075bc)
+        ;
+
+        
+    
+    
+            var marker_8da53205173f4b33062366967666b408 = L.marker(
+                [48.447816666, 1.487897222],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_ca7d1cd1fb887acbeb20a7cd8c1d0fd2 = L.popup({"maxWidth": 250});
+
+        
+            var html_51da5e910c9935548b091d144ae35847 = $(`<div id="html_51da5e910c9935548b091d144ae35847" style="width: 100.0%; height: 100.0%;"><b>Notre-Dame de Chartres</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Westfassade%20Chartres.jpg' width='200'></div>`)[0];
+            popup_ca7d1cd1fb887acbeb20a7cd8c1d0fd2.setContent(html_51da5e910c9935548b091d144ae35847);
+        
+
+        marker_8da53205173f4b33062366967666b408.bindPopup(popup_ca7d1cd1fb887acbeb20a7cd8c1d0fd2)
+        ;
+
+        
+    
+    
+            var marker_ac66a8818acac927e5cd5d34590dc3f1 = L.marker(
+                [48.805, 2.119444444],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_9d3621a11ebf706e540879f83dfe2f14 = L.popup({"maxWidth": 250});
+
+        
+            var html_3776597fe48264a2f7578d08ebbc6c36 = $(`<div id="html_3776597fe48264a2f7578d08ebbc6c36" style="width: 100.0%; height: 100.0%;"><b>Palace and Park of Versailles</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Chateau%20de%20Versailles%20P1190114.jpg' width='200'></div>`)[0];
+            popup_9d3621a11ebf706e540879f83dfe2f14.setContent(html_3776597fe48264a2f7578d08ebbc6c36);
+        
+
+        marker_ac66a8818acac927e5cd5d34590dc3f1.bindPopup(popup_9d3621a11ebf706e540879f83dfe2f14)
+        ;
+
+        
+    
+    
+            var marker_b26320cc0c41de82d3ce543643b48980 = L.marker(
+                [-21.0994, 55.48],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_ebf69fd6f1fc7c272aad866b318e5b57 = L.popup({"maxWidth": 250});
+
+        
+            var html_35f3f10cff55f19965386b0245464335 = $(`<div id="html_35f3f10cff55f19965386b0245464335" style="width: 100.0%; height: 100.0%;"><b>Pitons, cirques and remparts of Reunion Island</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Piton%20des%20neiges%20vu%20de%20la%20plaine%20des%20cafres.jpg' width='200'></div>`)[0];
+            popup_ebf69fd6f1fc7c272aad866b318e5b57.setContent(html_35f3f10cff55f19965386b0245464335);
+        
+
+        marker_b26320cc0c41de82d3ce543643b48980.bindPopup(popup_ebf69fd6f1fc7c272aad866b318e5b57)
+        ;
+
+        
+    
+    
+            var marker_97c053d2a8c0a1d459d5a3cc8d136084 = L.marker(
+                [48.69361111, 6.183333333],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_a9886ff8ba8a8a563a1a5e046251e67d = L.popup({"maxWidth": 250});
+
+        
+            var html_aa46e32945f3cd26838bac0db752de00 = $(`<div id="html_aa46e32945f3cd26838bac0db752de00" style="width: 100.0%; height: 100.0%;"><b>Place Stanislas, Place de la Carrière and Place d'Alliance in Nancy</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Place%20Stanislas%20%C3%A0%20Nancy.jpg' width='200'></div>`)[0];
+            popup_a9886ff8ba8a8a563a1a5e046251e67d.setContent(html_aa46e32945f3cd26838bac0db752de00);
+        
+
+        marker_97c053d2a8c0a1d459d5a3cc8d136084.bindPopup(popup_a9886ff8ba8a8a563a1a5e046251e67d)
+        ;
+
+        
+    
+    
+            var marker_ee076a874c03094805c8a6e2d043f2d5 = L.marker(
+                [43.9473, 4.5355],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_5f71403bdf0d19995b71e5158ecb4abe = L.popup({"maxWidth": 250});
+
+        
+            var html_c9d8c93522d232135662aefdbeb09107 = $(`<div id="html_c9d8c93522d232135662aefdbeb09107" style="width: 100.0%; height: 100.0%;"><b>Pont du Gard</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Pont%20du%20Gard%20BLS.jpg' width='200'></div>`)[0];
+            popup_5f71403bdf0d19995b71e5158ecb4abe.setContent(html_c9d8c93522d232135662aefdbeb09107);
+        
+
+        marker_ee076a874c03094805c8a6e2d043f2d5.bindPopup(popup_5f71403bdf0d19995b71e5158ecb4abe)
+        ;
+
+        
+    
+    
+            var marker_6d48bab4182ee26560abdadf8215fe77 = L.marker(
+                [48.559722222, 3.298888888],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_3a598077f39957f92c6cc047d9cf91fb = L.popup({"maxWidth": 250});
+
+        
+            var html_301b214e72f8889322f5c5c93654f61f = $(`<div id="html_301b214e72f8889322f5c5c93654f61f" style="width: 100.0%; height: 100.0%;"><b>Provins</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Provins%20Tour%20Cesar.jpg' width='200'></div>`)[0];
+            popup_3a598077f39957f92c6cc047d9cf91fb.setContent(html_301b214e72f8889322f5c5c93654f61f);
+        
+
+        marker_6d48bab4182ee26560abdadf8215fe77.bindPopup(popup_3a598077f39957f92c6cc047d9cf91fb)
+        ;
+
+        
+    
+    
+            var marker_debb864747d7e9148f13b8e90f27e48d = L.marker(
+                [44.13572222, 4.808416667],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_dd6dea76ec69cb847f2bf0f5a0e63a4c = L.popup({"maxWidth": 250});
+
+        
+            var html_8cad76b6af1af2bc013234ec3d132b09 = $(`<div id="html_8cad76b6af1af2bc013234ec3d132b09" style="width: 100.0%; height: 100.0%;"><b>Roman Theatre and its Surroundings and the "Triumphal Arch" of Orange</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Th%C3%A9%C3%A2tre%20antique%20d%27Orange%202.jpg' width='200'></div>`)[0];
+            popup_dd6dea76ec69cb847f2bf0f5a0e63a4c.setContent(html_8cad76b6af1af2bc013234ec3d132b09);
+        
+
+        marker_debb864747d7e9148f13b8e90f27e48d.bindPopup(popup_dd6dea76ec69cb847f2bf0f5a0e63a4c)
+        ;
+
+        
+    
+    
+            var marker_b8686807e9d7344b5703f8529cbb6b76 = L.marker(
+                [44.13572222, 4.808416667],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_23e58a1189026e7e70a78c3c7ecf521a = L.popup({"maxWidth": 250});
+
+        
+            var html_4cc7ae8699757a7f1f4e60fdf938e653 = $(`<div id="html_4cc7ae8699757a7f1f4e60fdf938e653" style="width: 100.0%; height: 100.0%;"><b>Roman Theatre and its Surroundings and the "Triumphal Arch" of Orange</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Th%C3%A9%C3%A2tre%20antique%20d%27Orange%202.jpg' width='200'></div>`)[0];
+            popup_23e58a1189026e7e70a78c3c7ecf521a.setContent(html_4cc7ae8699757a7f1f4e60fdf938e653);
+        
+
+        marker_b8686807e9d7344b5703f8529cbb6b76.bindPopup(popup_23e58a1189026e7e70a78c3c7ecf521a)
+        ;
+
+        
+    
+    
+            var marker_cbf177d5f43275178fd94d68202a83e1 = L.marker(
+                [46.566111111, 0.863611111],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_adecc706fdf4a7f4661661387de35c67 = L.popup({"maxWidth": 250});
+
+        
+            var html_ddd80c19549eb335acb5d546b7af0854 = $(`<div id="html_ddd80c19549eb335acb5d546b7af0854" style="width: 100.0%; height: 100.0%;"><b>Saint-Savin</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/PixAile7.jpg' width='200'></div>`)[0];
+            popup_adecc706fdf4a7f4661661387de35c67.setContent(html_ddd80c19549eb335acb5d546b7af0854);
+        
+
+        marker_cbf177d5f43275178fd94d68202a83e1.bindPopup(popup_adecc706fdf4a7f4661661387de35c67)
+        ;
+
+        
+    
+    
+            var marker_72c25f9ae28f2535b8f6ea4519319faf = L.marker(
+                [48.58444, 7.74889],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_ae3a2cf4a39a2f3acdf5d181bb851fb0 = L.popup({"maxWidth": 250});
+
+        
+            var html_9c6b203f61fb583333c1ca5d01eebe2e = $(`<div id="html_9c6b203f61fb583333c1ca5d01eebe2e" style="width: 100.0%; height: 100.0%;"><b>Strasbourg: from Grande-île to Neustadt, a European urban scene</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Kl%C3%A9ber%20Square%2C%20Strasbourg%20%2816080539557%29.jpg' width='200'></div>`)[0];
+            popup_ae3a2cf4a39a2f3acdf5d181bb851fb0.setContent(html_9c6b203f61fb583333c1ca5d01eebe2e);
+        
+
+        marker_72c25f9ae28f2535b8f6ea4519319faf.bindPopup(popup_ae3a2cf4a39a2f3acdf5d181bb851fb0)
+        ;
+
+        
+    
+    
+            var marker_72e08ce83f92613b53c9a759f54f3419 = L.marker(
+                [48.58444, 7.74889],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_888f2e44ba4e7d4b0e00527e98738c0b = L.popup({"maxWidth": 250});
+
+        
+            var html_2d889a0fb74c2ade92005e148783775a = $(`<div id="html_2d889a0fb74c2ade92005e148783775a" style="width: 100.0%; height: 100.0%;"><b>Strasbourg: from Grande-île to Neustadt, a European urban scene</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Strasbourg%20PanoO4.jpg' width='200'></div>`)[0];
+            popup_888f2e44ba4e7d4b0e00527e98738c0b.setContent(html_2d889a0fb74c2ade92005e148783775a);
+        
+
+        marker_72e08ce83f92613b53c9a759f54f3419.bindPopup(popup_888f2e44ba4e7d4b0e00527e98738c0b)
+        ;
+
+        
+    
+    
+            var marker_4c9ecb65c726e15886e3610c1f5d3356 = L.marker(
+                [-16.836111111, -151.359166666],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_c9952d34a5ee876269b87ce8659838a2 = L.popup({"maxWidth": 250});
+
+        
+            var html_72ee02d5406d3da9d1c19b6deb1798b4 = $(`<div id="html_72ee02d5406d3da9d1c19b6deb1798b4" style="width: 100.0%; height: 100.0%;"><b>Taputapuatea marae</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Taputapu%20marae%20Raiatea%20little%20man.jpg' width='200'></div>`)[0];
+            popup_c9952d34a5ee876269b87ce8659838a2.setContent(html_72ee02d5406d3da9d1c19b6deb1798b4);
+        
+
+        marker_4c9ecb65c726e15886e3610c1f5d3356.bindPopup(popup_c9952d34a5ee876269b87ce8659838a2)
+        ;
+
+        
+    
+    
+            var marker_fa6b3a29bae65ff155ced4954cbd2a87 = L.marker(
+                [46.468414, 6.829336],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_9a7f6afb50b6315884c71eeff7f67159 = L.popup({"maxWidth": 250});
+
+        
+            var html_058328a57ff48fc88796c0df5969b9e1 = $(`<div id="html_058328a57ff48fc88796c0df5969b9e1" style="width: 100.0%; height: 100.0%;"><b>The Architectural Work of Le Corbusier</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Chandigarh%20Secretariat.jpg' width='200'></div>`)[0];
+            popup_9a7f6afb50b6315884c71eeff7f67159.setContent(html_058328a57ff48fc88796c0df5969b9e1);
+        
+
+        marker_fa6b3a29bae65ff155ced4954cbd2a87.bindPopup(popup_9a7f6afb50b6315884c71eeff7f67159)
+        ;
+
+        
+    
+    
+            var marker_52bc46798af4dc4a5b143ac51869d09c = L.marker(
+                [44.2203, 3.4731],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_9e311170e58336b0595f06904ee6bfc4 = L.popup({"maxWidth": 250});
+
+        
+            var html_f8a00cef84e070b41ba310cfda4d6bcc = $(`<div id="html_f8a00cef84e070b41ba310cfda4d6bcc" style="width: 100.0%; height: 100.0%;"><b>The Causses and the Cévennes, Mediterranean agro-pastoral Cultural Landscape</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Cevennes%20Florac%20Mimente%20depuis%20Causse%20Mejean.jpg' width='200'></div>`)[0];
+            popup_9e311170e58336b0595f06904ee6bfc4.setContent(html_f8a00cef84e070b41ba310cfda4d6bcc);
+        
+
+        marker_52bc46798af4dc4a5b143ac51869d09c.bindPopup(popup_9e311170e58336b0595f06904ee6bfc4)
+        ;
+
+        
+    
+    
+            var marker_298b34f5e9647fb4d1d8f6a904bc0a29 = L.marker(
+                [51.381305555, -2.359055555],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_b5b033519d494c51f8eca089908a38fb = L.popup({"maxWidth": 250});
+
+        
+            var html_07008e3313675e6a3a2f1cfb06728e40 = $(`<div id="html_07008e3313675e6a3a2f1cfb06728e40" style="width: 100.0%; height: 100.0%;"><b>The Great Spa Towns of Europe</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Franti%C5%A1kovy%20L%C3%A1zn%C4%9B%20UNESCO%20plak%C3%A1t.jpg' width='200'></div>`)[0];
+            popup_b5b033519d494c51f8eca089908a38fb.setContent(html_07008e3313675e6a3a2f1cfb06728e40);
+        
+
+        marker_298b34f5e9647fb4d1d8f6a904bc0a29.bindPopup(popup_b5b033519d494c51f8eca089908a38fb)
+        ;
+
+        
+    
+    
+            var marker_ca4f2f202d971965cc7cf1e972e85569 = L.marker(
+                [46.123608333, 3.420277777],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_9e959be630424c5c5b3f7237ca2a5506 = L.popup({"maxWidth": 250});
+
+        
+            var html_e4944deb409041e7b4a493ed46e3e2c8 = $(`<div id="html_e4944deb409041e7b4a493ed46e3e2c8" style="width: 100.0%; height: 100.0%;"><b>The Great Spa Towns of Europe</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Franti%C5%A1kovy%20L%C3%A1zn%C4%9B%20UNESCO%20plak%C3%A1t.jpg' width='200'></div>`)[0];
+            popup_9e959be630424c5c5b3f7237ca2a5506.setContent(html_e4944deb409041e7b4a493ed46e3e2c8);
+        
+
+        marker_ca4f2f202d971965cc7cf1e972e85569.bindPopup(popup_9e959be630424c5c5b3f7237ca2a5506)
+        ;
+
+        
+    
+    
+            var marker_ecd3cce9bf7b1786749ff3c5486134d8 = L.marker(
+                [48.757494444, 8.242494444],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_12a899c61c638745e3b6f3e7b07f6967 = L.popup({"maxWidth": 250});
+
+        
+            var html_eac8cc082f01227183a0eb6629788909 = $(`<div id="html_eac8cc082f01227183a0eb6629788909" style="width: 100.0%; height: 100.0%;"><b>The Great Spa Towns of Europe</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Franti%C5%A1kovy%20L%C3%A1zn%C4%9B%20UNESCO%20plak%C3%A1t.jpg' width='200'></div>`)[0];
+            popup_12a899c61c638745e3b6f3e7b07f6967.setContent(html_eac8cc082f01227183a0eb6629788909);
+        
+
+        marker_ecd3cce9bf7b1786749ff3c5486134d8.bindPopup(popup_12a899c61c638745e3b6f3e7b07f6967)
+        ;
+
+        
+    
+    
+            var marker_7ca576685243333cc20c9b31e7754f94 = L.marker(
+                [50.492222222, 5.866944444],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_d553933cb65ddac4d435d757d51bcc6d = L.popup({"maxWidth": 250});
+
+        
+            var html_dd3c1ca4b35734c80042822615b71ac4 = $(`<div id="html_dd3c1ca4b35734c80042822615b71ac4" style="width: 100.0%; height: 100.0%;"><b>The Great Spa Towns of Europe</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Franti%C5%A1kovy%20L%C3%A1zn%C4%9B%20UNESCO%20plak%C3%A1t.jpg' width='200'></div>`)[0];
+            popup_d553933cb65ddac4d435d757d51bcc6d.setContent(html_dd3c1ca4b35734c80042822615b71ac4);
+        
+
+        marker_7ca576685243333cc20c9b31e7754f94.bindPopup(popup_d553933cb65ddac4d435d757d51bcc6d)
+        ;
+
+        
+    
+    
+            var marker_c4d0a800a9836e5ccec847d01f890341 = L.marker(
+                [50.330555555, 7.728608333],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_b3d05af98798cb1bd937e5cab0c598b4 = L.popup({"maxWidth": 250});
+
+        
+            var html_034c1a0bd2b4f277fcd9e25d038fd6de = $(`<div id="html_034c1a0bd2b4f277fcd9e25d038fd6de" style="width: 100.0%; height: 100.0%;"><b>The Great Spa Towns of Europe</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Franti%C5%A1kovy%20L%C3%A1zn%C4%9B%20UNESCO%20plak%C3%A1t.jpg' width='200'></div>`)[0];
+            popup_b3d05af98798cb1bd937e5cab0c598b4.setContent(html_034c1a0bd2b4f277fcd9e25d038fd6de);
+        
+
+        marker_c4d0a800a9836e5ccec847d01f890341.bindPopup(popup_b3d05af98798cb1bd937e5cab0c598b4)
+        ;
+
+        
+    
+    
+            var marker_a5e08b6e6dc773268b41981153941a6b = L.marker(
+                [43.888605555, 10.779444444],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_f84d22dbc5a5cca4f66171b5bafc5cc9 = L.popup({"maxWidth": 250});
+
+        
+            var html_7ee15f3323d535333133299db532648c = $(`<div id="html_7ee15f3323d535333133299db532648c" style="width: 100.0%; height: 100.0%;"><b>The Great Spa Towns of Europe</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Franti%C5%A1kovy%20L%C3%A1zn%C4%9B%20UNESCO%20plak%C3%A1t.jpg' width='200'></div>`)[0];
+            popup_f84d22dbc5a5cca4f66171b5bafc5cc9.setContent(html_7ee15f3323d535333133299db532648c);
+        
+
+        marker_a5e08b6e6dc773268b41981153941a6b.bindPopup(popup_f84d22dbc5a5cca4f66171b5bafc5cc9)
+        ;
+
+        
+    
+    
+            var marker_4d6707020646a505e63ea96a14cef3c0 = L.marker(
+                [50.197775, 10.075],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_48fe81248864697963cb65dc6ea5c040 = L.popup({"maxWidth": 250});
+
+        
+            var html_fb94bc8f050f1e04bb3d5c436365def0 = $(`<div id="html_fb94bc8f050f1e04bb3d5c436365def0" style="width: 100.0%; height: 100.0%;"><b>The Great Spa Towns of Europe</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Franti%C5%A1kovy%20L%C3%A1zn%C4%9B%20UNESCO%20plak%C3%A1t.jpg' width='200'></div>`)[0];
+            popup_48fe81248864697963cb65dc6ea5c040.setContent(html_fb94bc8f050f1e04bb3d5c436365def0);
+        
+
+        marker_4d6707020646a505e63ea96a14cef3c0.bindPopup(popup_48fe81248864697963cb65dc6ea5c040)
+        ;
+
+        
+    
+    
+            var marker_460aa0e7d5b80e86414aabdc5fc4dde1 = L.marker(
+                [50.117222222, 12.350555555],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_dc206ee807d41c966ad8b375583efb8f = L.popup({"maxWidth": 250});
+
+        
+            var html_99c29015e84f289fdec8b0d272d87e08 = $(`<div id="html_99c29015e84f289fdec8b0d272d87e08" style="width: 100.0%; height: 100.0%;"><b>The Great Spa Towns of Europe</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Franti%C5%A1kovy%20L%C3%A1zn%C4%9B%20UNESCO%20plak%C3%A1t.jpg' width='200'></div>`)[0];
+            popup_dc206ee807d41c966ad8b375583efb8f.setContent(html_99c29015e84f289fdec8b0d272d87e08);
+        
+
+        marker_460aa0e7d5b80e86414aabdc5fc4dde1.bindPopup(popup_dc206ee807d41c966ad8b375583efb8f)
+        ;
+
+        
+    
+    
+            var marker_24561795e68d9254678c347cd50ac458 = L.marker(
+                [49.964958333, 12.701322222],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_e89ff9c55fe134a70909a15d79b8e1d0 = L.popup({"maxWidth": 250});
+
+        
+            var html_45053b000a4b58009e241b8075af37a6 = $(`<div id="html_45053b000a4b58009e241b8075af37a6" style="width: 100.0%; height: 100.0%;"><b>The Great Spa Towns of Europe</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Franti%C5%A1kovy%20L%C3%A1zn%C4%9B%20UNESCO%20plak%C3%A1t.jpg' width='200'></div>`)[0];
+            popup_e89ff9c55fe134a70909a15d79b8e1d0.setContent(html_45053b000a4b58009e241b8075af37a6);
+        
+
+        marker_24561795e68d9254678c347cd50ac458.bindPopup(popup_e89ff9c55fe134a70909a15d79b8e1d0)
+        ;
+
+        
+    
+    
+            var marker_4a9f6615f15fbbf5ea55884552ecd603 = L.marker(
+                [50.223055555, 12.883605555],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_1ce14de28ccfa492373e5a1e30c9ed17 = L.popup({"maxWidth": 250});
+
+        
+            var html_4918e5e5a12db5fef07c5a3b9bd93627 = $(`<div id="html_4918e5e5a12db5fef07c5a3b9bd93627" style="width: 100.0%; height: 100.0%;"><b>The Great Spa Towns of Europe</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Franti%C5%A1kovy%20L%C3%A1zn%C4%9B%20UNESCO%20plak%C3%A1t.jpg' width='200'></div>`)[0];
+            popup_1ce14de28ccfa492373e5a1e30c9ed17.setContent(html_4918e5e5a12db5fef07c5a3b9bd93627);
+        
+
+        marker_4a9f6615f15fbbf5ea55884552ecd603.bindPopup(popup_1ce14de28ccfa492373e5a1e30c9ed17)
+        ;
+
+        
+    
+    
+            var marker_faf9e29f7b787ad7257504a94b22ef98 = L.marker(
+                [48.009994444, 16.233605555],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_e7fc9fa1d021a630776ec40e1dfbdc27 = L.popup({"maxWidth": 250});
+
+        
+            var html_9c579ff9ac2279d1aa1056f88e5bc7f2 = $(`<div id="html_9c579ff9ac2279d1aa1056f88e5bc7f2" style="width: 100.0%; height: 100.0%;"><b>The Great Spa Towns of Europe</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Franti%C5%A1kovy%20L%C3%A1zn%C4%9B%20UNESCO%20plak%C3%A1t.jpg' width='200'></div>`)[0];
+            popup_e7fc9fa1d021a630776ec40e1dfbdc27.setContent(html_9c579ff9ac2279d1aa1056f88e5bc7f2);
+        
+
+        marker_faf9e29f7b787ad7257504a94b22ef98.bindPopup(popup_e7fc9fa1d021a630776ec40e1dfbdc27)
+        ;
+
+        
+    
+    
+            var marker_ab0899aafd7b597c01f88380dce38dc4 = L.marker(
+                [47.21629, 0.06218],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_5b06677290e814e712d9e3c1c192e946 = L.popup({"maxWidth": 250});
+
+        
+            var html_f0b67569ba40afbf829a526cfb563ee8 = $(`<div id="html_f0b67569ba40afbf829a526cfb563ee8" style="width: 100.0%; height: 100.0%;"><b>The Loire Valley between Sully-sur-Loire and Chalonnes</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Chambord%20Castle%20Northwest%20facade.jpg' width='200'></div>`)[0];
+            popup_5b06677290e814e712d9e3c1c192e946.setContent(html_f0b67569ba40afbf829a526cfb563ee8);
+        
+
+        marker_ab0899aafd7b597c01f88380dce38dc4.bindPopup(popup_5b06677290e814e712d9e3c1c192e946)
+        ;
+
+        
+    
+    
+            var marker_4291ff007062281b6c056e2369a3df66 = L.marker(
+                [47.466388888, 3.748333333],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_6916ae0caf7028d5357359b04ffb53f2 = L.popup({"maxWidth": 250});
+
+        
+            var html_665374aa61359af3c81424e984cdc788 = $(`<div id="html_665374aa61359af3c81424e984cdc788" style="width: 100.0%; height: 100.0%;"><b>Vézelay, Church and Hill</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/2003-%20%27V%C3%A9zelay%20en%20hiver%27%20-%20Marie-Claire%20Lef%C3%A9bure.JPG' width='200'></div>`)[0];
+            popup_6916ae0caf7028d5357359b04ffb53f2.setContent(html_665374aa61359af3c81424e984cdc788);
+        
+
+        marker_4291ff007062281b6c056e2369a3df66.bindPopup(popup_6916ae0caf7028d5357359b04ffb53f2)
+        ;
+
+        
+    
+    
+            var marker_4259f9109a50e86bc72d1066ebf598c7 = L.marker(
+                [50.4625, 3.54611],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_a61f0d5f333effd731555faa91292187 = L.popup({"maxWidth": 250});
+
+        
+            var html_4d51485fd6534e45096867cb32e136e9 = $(`<div id="html_4d51485fd6534e45096867cb32e136e9" style="width: 100.0%; height: 100.0%;"><b>northern French coal mining region</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/Bassin%20minier%20du%20Nord-Pas-de-Calais%20-%20Vues%20g%C3%A9n%C3%A9rales%20du%20patrimoine.jpg' width='200'></div>`)[0];
+            popup_a61f0d5f333effd731555faa91292187.setContent(html_4d51485fd6534e45096867cb32e136e9);
+        
+
+        marker_4259f9109a50e86bc72d1066ebf598c7.bindPopup(popup_a61f0d5f333effd731555faa91292187)
+        ;
+
+        
+    
+    
+            var marker_8f6815176079fdd2444a684f4d89f203 = L.marker(
+                [44.838888888, -0.572222222],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_ada724de695cda5863f80907b00f1feb = L.popup({"maxWidth": 250});
+
+        
+            var html_585a2c30a0a6487ec9bd2820874abe26 = $(`<div id="html_585a2c30a0a6487ec9bd2820874abe26" style="width: 100.0%; height: 100.0%;"><b>port of the Moon</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/La%20Grosse%20Cloche%20%28Bordeaux%29.JPG' width='200'></div>`)[0];
+            popup_ada724de695cda5863f80907b00f1feb.setContent(html_585a2c30a0a6487ec9bd2820874abe26);
+        
+
+        marker_8f6815176079fdd2444a684f4d89f203.bindPopup(popup_ada724de695cda5863f80907b00f1feb)
+        ;
+
+        
+    
+    
+            var marker_668d22a70d61b35114bb8648b8fa7d01 = L.marker(
+                [49.4891, 0.115222],
+                {}
+            ).addTo(marker_cluster_ce6691643d775546087c88882cc22db1);
+        
+    
+        var popup_b34959ad986255d25b0abbd4b993c882 = L.popup({"maxWidth": 250});
+
+        
+            var html_014f83a8a88b2913e291565b10005fa3 = $(`<div id="html_014f83a8a88b2913e291565b10005fa3" style="width: 100.0%; height: 100.0%;"><b>reconstructed center of Le Havre</b><br><img src='http://commons.wikimedia.org/wiki/Special:FilePath/LeHavre.jpg' width='200'></div>`)[0];
+            popup_b34959ad986255d25b0abbd4b993c882.setContent(html_014f83a8a88b2913e291565b10005fa3);
+        
+
+        marker_668d22a70d61b35114bb8648b8fa7d01.bindPopup(popup_b34959ad986255d25b0abbd4b993c882)
+        ;
+
+        
+    
+</script>
 </html>
